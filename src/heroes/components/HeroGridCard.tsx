@@ -4,6 +4,7 @@ import { Card, CardHeader, CardContent } from "../../components/ui/card"
 import { Badge } from "../../components/ui/badge"
 import { Progress } from "../../components/ui/progress"
 import type { Hero } from "../types/hero.interface"
+import { translateFields } from "../utils/translateFields"
 import { useNavigate } from "react-router"
 import { use } from "react"
 import { FavoriteHeroContext } from "../context/FavoriteHeroContext"
@@ -34,7 +35,7 @@ export const HeroGridCard = ({ hero }: Props) => {
                 <div className="absolute top-3 left-3 flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full ${hero.status === 'Active' ? ' bg-green-500' : 'bg-red-500'}`} />
                     <Badge variant="secondary" className="text-xs bg-white/90 text-gray-700">
-                        {hero.status}
+                        {translateFields[hero.status] ?? hero.status}
                     </Badge>
                 </div>
 
@@ -72,7 +73,7 @@ export const HeroGridCard = ({ hero }: Props) => {
                         <h3 className="font-bold text-lg leading-tight">{hero.alias}</h3>
                         <p className="text-sm text-gray-600">{hero.name}</p>
                     </div>
-                    <Badge className="text-xs bg-green-100 text-green-800 border-green-200">{hero.category}</Badge>
+                    <Badge className="text-xs bg-green-100 text-green-800 border-green-200">{translateFields[hero.category] ?? hero.category}</Badge>
                 </div>
                 <Badge variant="outline" className="w-fit text-xs">
                     {hero.team}

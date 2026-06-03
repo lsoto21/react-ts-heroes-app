@@ -105,7 +105,7 @@ export const HomePage = () => {
                             return prev;
                         })}
                     >
-                        All Characters ({summary?.totalHeroes})
+                        Todos los personajes ({summary?.totalHeroes})
                     </TabsTrigger>
                     <TabsTrigger value="favorites" className="flex items-center gap-2"
                         onClick={() => setSearchParams((prev) => {
@@ -113,7 +113,7 @@ export const HomePage = () => {
                             return prev;
                         })}
                     >
-                        Favorites ({favoriteCount})
+                        Favoritos ({favoriteCount})
                     </TabsTrigger>
                     <TabsTrigger value="heroes"
                         onClick={() => setSearchParams((prev) => {
@@ -123,7 +123,7 @@ export const HomePage = () => {
                             return prev;
                         })}
                     >
-                        Heroes ({summary?.heroCount})
+                        Héroes ({summary?.heroCount})
                     </TabsTrigger>
                     <TabsTrigger value="villains"
                         onClick={() => setSearchParams((prev) => {
@@ -133,7 +133,7 @@ export const HomePage = () => {
                             return prev;
                         })}
                     >
-                        Villains ({summary?.villainCount})
+                        Villanos ({summary?.villainCount})
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value='all'>

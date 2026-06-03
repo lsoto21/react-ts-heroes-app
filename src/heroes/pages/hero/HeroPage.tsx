@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { Shield, Zap, Brain, Gauge, Users, Star, Award } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { getHeroAction } from "../../actions/get-hero"
+import { translateFields } from "../../utils/translateFields"
 
 
 export const HeroPage = () => {
@@ -37,12 +38,12 @@ export const HeroPage = () => {
 
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
-            case "activo":
+            case "active":
                 return "bg-green-500"
-            case "inactivo":
+            case "inactive":
                 return "bg-gray-500"
-            case "retirado":
-                return "bg-blue-500"
+            case "deceased":
+                return "bg-red-500"
             default:
                 return "bg-gray-500"
         }
@@ -50,11 +51,11 @@ export const HeroPage = () => {
 
     const getCategoryColor = (category: string) => {
         switch (category.toLowerCase()) {
-            case "héroe":
+            case "hero":
                 return "bg-blue-500"
-            case "villano":
+            case "villain":
                 return "bg-red-500"
-            case "antihéroe":
+            case "antihero":
                 return "bg-purple-500"
             default:
                 return "bg-gray-500"
@@ -85,9 +86,9 @@ export const HeroPage = () => {
                         <div className="flex-1 text-center md:text-left">
                             <div className="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
                                 <Badge className={`${getCategoryColor(heroData.category)} text-white`}>
-                                    {heroData.category}
+                                    {translateFields[heroData.category] ?? heroData.category}
                                 </Badge>
-                                <Badge className={`${getStatusColor(heroData.status)} text-white`}>{heroData.status}</Badge>
+                                <Badge className={`${getStatusColor(heroData.status)} text-white`}>{translateFields[heroData.status] ?? heroData.status}</Badge>
                                 <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
                                     {heroData.universe}
                                 </Badge>

@@ -11,7 +11,7 @@ export const HeroStats = () => {
     const { data: summary } = useHeroSummary();
 
     if (!summary) {
-        return <div>Loading ...</div>
+        return <div>Cargando ...</div>
     }
 
     return (
@@ -23,10 +23,10 @@ export const HeroStats = () => {
                 <div className="text-2xl font-bold">{summary?.totalHeroes}</div>
                 <div className="flex gap-1 mt-2">
                     <Badge variant="secondary" className="text-xs">
-                        {summary?.heroCount} Heroes
+                        {summary?.heroCount} Héroes
                     </Badge>
                     <Badge variant="destructive" className="text-xs">
-                        {summary?.villainCount} Villains
+                        {summary?.villainCount} Villanos
                     </Badge>
                 </div>
             </HeroStatCard>
@@ -38,7 +38,7 @@ export const HeroStats = () => {
                 {/* TODO: ... */}
                 <div className="text-2xl font-bold text-red-600">{favoriteCount}</div>
                 <p className="text-xs text-muted-foreground">
-                    {(favoriteCount / (summary.totalHeroes) * 100).toFixed(2)}% of total
+                    {(favoriteCount / (summary.totalHeroes) * 100).toFixed(2)}% del total
                 </p>
             </HeroStatCard>
 

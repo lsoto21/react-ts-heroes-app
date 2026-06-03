@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from "../../../../components/ui/select";
 import { getFiltersAction } from "../../../../heroes/actions/get-filters.action";
+import { translateFields } from "../../../../heroes/utils/translateFields";
 
 export const SearchControls = () => {
 
@@ -104,13 +105,13 @@ export const SearchControls = () => {
 
     return (
         <>
-            <div className="flex flex-col lg:flex-row gap-4 mb-8">
+            <div className="flex flex-col gap-4 mb-8">
                 {/* Search */}
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <Input
                         ref={inputRef}
-                        placeholder="Search heroes, villains, powers, teams..."
+                        placeholder="Buscar por el nombre de héroes, villanos..."
                         className="pl-12 h-12 text-lg bg-white"
                         onKeyDown={handleKeyDown}
                         defaultValue={searchParams.get('name') ?? ''}
@@ -118,7 +119,7 @@ export const SearchControls = () => {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex gap-2">
+                <div className="flex w-70 gap-2">
                     <Button variant={activeAccordion === 'advance-filters' ? "default" : "outline"} className="h-12"
                         onClick={() => {
                             if (activeAccordion === 'advance-filters') {
@@ -129,7 +130,7 @@ export const SearchControls = () => {
                         }}
                     >
                         <Filter className="h-4 w-4 mr-2" />
-                        Filters
+                        Filtros avanzados
                     </Button>
                 </div>
             </div>
@@ -138,11 +139,10 @@ export const SearchControls = () => {
             {/*Búsquedas avanzadas */}
             <Accordion type="single" collapsible value={activeAccordion} onValueChange={handleAccordionChange}>
                 <AccordionItem value="advance-filters">
-                    <AccordionTrigger>Filtros avanzados</AccordionTrigger>
                     <AccordionContent>
                         <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold">Advanced Filters</h3>
+                                <h3 className="text-lg font-semibold">Filtros Avanzados</h3>
                                 <Button
                                     variant="ghost"
                                     onClick={clearAllFilters}
@@ -150,12 +150,12 @@ export const SearchControls = () => {
                                     className="gap-2"
                                 >
                                     <X className="h-4 w-4" />
-                                    Clear All
+                                    Limpiar todo
                                 </Button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Team</label>
+                                    <label className="text-sm font-medium">Equipo</label>
                                     <Select
                                         value={searchParams.get('team') || undefined}
                                         onValueChange={(value) => {
@@ -171,10 +171,10 @@ export const SearchControls = () => {
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full">
-                                            <SelectValue placeholder="All teams" />
+                                            <SelectValue placeholder="Todos los equipos" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All teams</SelectItem>
+                                            <SelectItem value="all">Todos los equipos</SelectItem>
                                             {filterOptions?.teams.map(team => (
                                                 <SelectItem key={team} value={team}>{team}</SelectItem>
                                             ))}
@@ -182,7 +182,7 @@ export const SearchControls = () => {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Category</label>
+                                    <label className="text-sm font-medium">Categoría</label>
                                     <Select
                                         value={searchParams.get('category') || undefined}
                                         onValueChange={(value) => {
@@ -198,18 +198,18 @@ export const SearchControls = () => {
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full">
-                                            <SelectValue placeholder="All categories" />
+                                            <SelectValue placeholder="Todas las categorías" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All categories</SelectItem>
+                                            <SelectItem value="all">Todas las categorías</SelectItem>
                                             {filterOptions?.categories.map(category => (
-                                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                                                <SelectItem key={category} value={category}>{translateFields[category] ?? category}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Universe</label>
+                                    <label className="text-sm font-medium">Universo</label>
                                     <Select
                                         value={searchParams.get('universe') || undefined}
                                         onValueChange={(value) => {
@@ -225,10 +225,10 @@ export const SearchControls = () => {
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full">
-                                            <SelectValue placeholder="All universes" />
+                                            <SelectValue placeholder="Todos los universos" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All universes</SelectItem>
+                                            <SelectItem value="all">Todos los universos</SelectItem>
                                             {filterOptions?.universes.map(universe => (
                                                 <SelectItem key={universe} value={universe}>{universe}</SelectItem>
                                             ))}
@@ -236,7 +236,7 @@ export const SearchControls = () => {
                                     </Select>
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Status</label>
+                                    <label className="text-sm font-medium">Estado</label>
                                     <Select
                                         value={searchParams.get('status') || undefined}
                                         onValueChange={(value) => {
@@ -252,19 +252,19 @@ export const SearchControls = () => {
                                         }}
                                     >
                                         <SelectTrigger className="h-10 w-full">
-                                            <SelectValue placeholder="All statuses" />
+                                            <SelectValue placeholder="Todos los estados" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="all">All statuses</SelectItem>
+                                            <SelectItem value="all">Todos los estados</SelectItem>
                                             {filterOptions?.statuses.map(status => (
-                                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                                                <SelectItem key={status} value={status}>{translateFields[status] ?? status}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                             <div className="mt-4">
-                                <label className="text-sm font-medium">Minimum Strength: {selectedStrength}/10</label>
+                                <label className="text-sm font-medium">Fuerza mínima: {selectedStrength}/10</label>
                                 <Slider
                                     value={sliderValue}
                                     onValueChange={handleSliderChange}
