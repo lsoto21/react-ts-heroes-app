@@ -1,23 +1,34 @@
-import { Search, Filter, SortAsc, Grid, Plus } from "lucide-react"
+import { Search, Filter, X } from "lucide-react"
 import { Button } from "../../../../components/ui/button"
 import { Input } from "../../../../components/ui/input"
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useQuery } from "@tanstack/react-query";
 import { Slider } from "../../../../components/ui/slider";
 import {
     Accordion,
     AccordionContent,
     AccordionItem,
+    AccordionTrigger,
 } from "../../../../components/ui/accordion";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../../components/ui/select";
+import { getFiltersAction } from "../../../../heroes/actions/get-filters.action";
 
 export const SearchControls = () => {
 
-    // const [query, setQuery] = useState<string>('');
     const [searchParams, setSearchParams] = useSearchParams();
     const inputRef = useRef<HTMLInputElement>(null);
-
+    const [sliderValue, setSliderValue] = useState<number[]>([
+        Number(searchParams.get('strength') || '0')
+    ]);
     const activeAccordion = searchParams.get('active-accordion') ?? '';
-    const selectedStrength = Number(searchParams.get('strength') ?? 0);
+    const selectedStrength = sliderValue[0];
 
     const setQueryParams = (name: string, value: string) => {
         setSearchParams((prev) => {
@@ -33,6 +44,61 @@ export const SearchControls = () => {
                 prev.set('name', value);
                 return prev;
             })
+        }
+    }
+
+    const handleSliderChange = (value: number[]) => {
+        setSliderValue(value);
+        setQueryParams('strength', value[0].toString());
+    }
+
+    const handleSliderComplete = (value: number[]) => {
+        setSliderValue(value);
+        setSearchParams(prev => {
+            prev.set('strength', value[0].toString());
+            prev.set('page', '1');
+            return prev;
+        });
+    }
+
+    // Fetch filter options from the API
+    const { data: filterOptions } = useQuery({
+        queryKey: ['filters'],
+        queryFn: () => getFiltersAction(),
+        staleTime: 1000 * 60 * 5,
+    });
+
+    const hasActiveFilters = () => {
+        const name = searchParams.get('name');
+        const team = searchParams.get('team');
+        const category = searchParams.get('category');
+        const universe = searchParams.get('universe');
+        const status = searchParams.get('status');
+        const strength = searchParams.get('strength');
+        return !!(name || team || category || universe || status || (strength && Number(strength) > 0));
+    }
+
+    const handleAccordionChange = (value: string) => {
+        if (value === 'advance-filters' || value === '') {
+            setQueryParams('active-accordion', value);
+        }
+    }
+
+    const clearAllFilters = () => {
+        setSearchParams((prev) => {
+            prev.delete('name');
+            prev.delete('team');
+            prev.delete('category');
+            prev.delete('universe');
+            prev.delete('status');
+            prev.delete('strength');
+            prev.delete('active-accordion');
+            prev.set('page', '1');
+            return prev;
+        });
+        setSliderValue([0]);
+        if (inputRef.current) {
+            inputRef.current.value = '';
         }
     }
 
@@ -57,10 +123,6 @@ export const SearchControls = () => {
                         onClick={() => {
                             if (activeAccordion === 'advance-filters') {
                                 setQueryParams('active-accordion', '');
-                                // setSearchParams((prev) => {
-                                //     prev.delete('active-accordion');
-                                //     return prev;
-                                // });
                                 return;
                             }
                             setQueryParams('active-accordion', 'advance-filters')
@@ -69,66 +131,148 @@ export const SearchControls = () => {
                         <Filter className="h-4 w-4 mr-2" />
                         Filters
                     </Button>
-
-                    <Button variant="outline" className="h-12">
-                        <SortAsc className="h-4 w-4 mr-2" />
-                        Sort by Name
-                    </Button>
-
-                    <Button variant="outline" className="h-12">
-                        <Grid className="h-4 w-4" />
-                    </Button>
-
-                    <Button className="h-12">
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Character
-                    </Button>
                 </div>
             </div>
 
 
             {/*Búsquedas avanzadas */}
-            <Accordion type="single" collapsible value={activeAccordion}>
+            <Accordion type="single" collapsible value={activeAccordion} onValueChange={handleAccordionChange}>
                 <AccordionItem value="advance-filters">
-                    {/* <AccordionTrigger>Filtros avanzados</AccordionTrigger> */}
+                    <AccordionTrigger>Filtros avanzados</AccordionTrigger>
                     <AccordionContent>
                         <div className="bg-white rounded-lg p-6 mb-8 shadow-sm border">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold">Advanced Filters</h3>
-                                <Button variant="ghost">Clear All</Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={clearAllFilters}
+                                    disabled={!hasActiveFilters()}
+                                    className="gap-2"
+                                >
+                                    <X className="h-4 w-4" />
+                                    Clear All
+                                </Button>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Team</label>
-                                    <div className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                                        All teams
-                                    </div>
+                                    <Select
+                                        value={searchParams.get('team') || undefined}
+                                        onValueChange={(value) => {
+                                            setSearchParams(prev => {
+                                                if (value === 'all') {
+                                                    prev.delete('team');
+                                                } else {
+                                                    prev.set('team', value);
+                                                }
+                                                prev.set('page', '1');
+                                                return prev;
+                                            });
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full">
+                                            <SelectValue placeholder="All teams" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All teams</SelectItem>
+                                            {filterOptions?.teams.map(team => (
+                                                <SelectItem key={team} value={team}>{team}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Category</label>
-                                    <div className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                                        All categories
-                                    </div>
+                                    <Select
+                                        value={searchParams.get('category') || undefined}
+                                        onValueChange={(value) => {
+                                            setSearchParams(prev => {
+                                                if (value === 'all') {
+                                                    prev.delete('category');
+                                                } else {
+                                                    prev.set('category', value);
+                                                }
+                                                prev.set('page', '1');
+                                                return prev;
+                                            });
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full">
+                                            <SelectValue placeholder="All categories" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All categories</SelectItem>
+                                            {filterOptions?.categories.map(category => (
+                                                <SelectItem key={category} value={category}>{category}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Universe</label>
-                                    <div className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                                        All universes
-                                    </div>
+                                    <Select
+                                        value={searchParams.get('universe') || undefined}
+                                        onValueChange={(value) => {
+                                            setSearchParams(prev => {
+                                                if (value === 'all') {
+                                                    prev.delete('universe');
+                                                } else {
+                                                    prev.set('universe', value);
+                                                }
+                                                prev.set('page', '1');
+                                                return prev;
+                                            });
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full">
+                                            <SelectValue placeholder="All universes" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All universes</SelectItem>
+                                            {filterOptions?.universes.map(universe => (
+                                                <SelectItem key={universe} value={universe}>{universe}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Status</label>
-                                    <div className="h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                                        All statuses
-                                    </div>
+                                    <Select
+                                        value={searchParams.get('status') || undefined}
+                                        onValueChange={(value) => {
+                                            setSearchParams(prev => {
+                                                if (value === 'all') {
+                                                    prev.delete('status');
+                                                } else {
+                                                    prev.set('status', value);
+                                                }
+                                                prev.set('page', '1');
+                                                return prev;
+                                            });
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-10 w-full">
+                                            <SelectValue placeholder="All statuses" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">All statuses</SelectItem>
+                                            {filterOptions?.statuses.map(status => (
+                                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                             <div className="mt-4">
                                 <label className="text-sm font-medium">Minimum Strength: {selectedStrength}/10</label>
                                 <Slider
-                                    defaultValue={[selectedStrength]}
-                                    onValueChange={value => setQueryParams('strength', value[0].toString())}
-                                    max={10} step={1} />
+                                    value={sliderValue}
+                                    onValueChange={handleSliderChange}
+                                    onValueCommit={handleSliderComplete}
+                                    max={10}
+                                    step={1}
+                                    className="w-full"
+                                />
                             </div>
                         </div>
                     </AccordionContent>

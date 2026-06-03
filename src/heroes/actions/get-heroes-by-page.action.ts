@@ -6,7 +6,13 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export const getHeroesByPage = async (
     page: number,
     limit: number = 6,
-    category: string = 'all'
+    category: string = 'all',
+    filters?: {
+        team?: string;
+        universe?: string;
+        status?: string;
+        strength?: string;
+    }
 ): Promise<HeroesResponse> => {
     if (isNaN(page)) page = 1;
     if (isNaN(limit)) limit = 6;
@@ -16,6 +22,10 @@ export const getHeroesByPage = async (
             limit: limit,
             offset: (page - 1) * limit,  // offset = saltarse los x elementos primeros múltiplos del límite.
             category: category,
+            team: filters?.team,
+            universe: filters?.universe,
+            status: filters?.status,
+            strength: filters?.strength,
         }
     });
 

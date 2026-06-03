@@ -1,6 +1,5 @@
 import { createHashRouter, Navigate } from "react-router";
 
-
 import { HomePage } from "../heroes/pages/home/HomePage";
 import { HeroPage } from "../heroes/pages/hero/HeroPage";
 // import { SearchPage } from "../heroes/pages/search/SearchPage";
